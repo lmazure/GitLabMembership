@@ -35,6 +35,10 @@ The main visualization is a **Matrix Table**.
 -   Roles: `Guest`, `Reporter`, `Developer`, `Maintainer`, `Owner`, etc.
 -   Empty cell indicates no membership.
 
+### Header Styling
+-   **Sticky Header**: The header row containing member names should remain visible at the top of the table when scrolling vertically.
+-   **Rotated Headers**: Member names in the column headers should be rotated (e.g., vertical or angled) to conserve horizontal space and prevent truncation.
+
 ## Behavior & Logic
 
 ### Lazy Loading

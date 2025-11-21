@@ -82,8 +82,13 @@
             background: white;
             border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            overflow-x: auto;
-            padding: 20px;
+            overflow: auto;
+            /* Enable both X and Y scrolling */
+            padding: 0;
+            /* Remove padding to let sticky work to edges */
+            max-height: calc(100vh - 150px);
+            /* Constrain height to viewport */
+            position: relative;
         }
 
         /* Matrix Table Styles */
@@ -104,6 +109,38 @@
             position: sticky;
             top: 0;
             z-index: 10;
+            /* For rotated text alignment */
+            vertical-align: bottom;
+            height: 140px;
+            /* Fixed height for rotated headers */
+            display: flex;
+            align-items: flex-end;
+            overflow: hidden;
+        }
+
+        .header-cell.row-header {
+            z-index: 20;
+            /* Higher than other headers */
+            left: 0;
+            background: #f3f4f6;
+            /* Ensure opaque background */
+            height: auto;
+            /* Reset height for the top-left cell */
+            display: block;
+            /* Reset display */
+            align-items: normal;
+            min-width: 300px;
+            /* Ensure width matches grid col */
+        }
+
+        .header-content {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            white-space: nowrap;
+            width: 100%;
+            text-align: left;
+            /* Becomes bottom because of rotation */
+            padding: 5px;
         }
 
         .row-header {
@@ -148,23 +185,38 @@
         .role-owner {
             color: #d9534f;
             font-weight: bold;
+            background-color: #fdf2f2;
         }
 
         .role-maintainer {
             color: #f0ad4e;
             font-weight: bold;
+            background-color: #fcf8e3;
         }
 
         .role-developer {
             color: #5cb85c;
+            background-color: #eaf6ea;
         }
 
         .role-reporter {
             color: #5bc0de;
+            background-color: #eef9fc;
         }
 
         .role-guest {
             color: #777;
+            background-color: #f9f9f9;
+        }
+
+        /* Add hover effect for rows */
+        .matrix-table>div:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Fix hover for sticky cols */
+        .row-header:hover {
+            background-color: #f8f9fa;
         }
 
         .loading {
@@ -468,16 +520,18 @@
 
             // Update Grid Template
             // First col auto (or fixed width), others auto
-            els.matrixContainer.style.gridTemplateColumns = `300px repeat(${state.columns.length}, minmax(100px, auto))`;
+            els.matrixContainer.style.gridTemplateColumns = `300px repeat(${state.columns.length}, minmax(40px, auto))`;
 
-            let html = '<div class="matrix-table" style="grid-template-columns: 300px repeat(' + state.columns.length + ', minmax(100px, 1fr));">';
+            let html = '<div class="matrix-table" style="grid-template-columns: 300px repeat(' + state.columns.length + ', minmax(40px, 1fr));">';
 
             // 1. Header Row
             // Top-Left Corner
             html += '<div class="header-cell row-header" style="z-index:20">Hierarchy</div>';
             // Member Columns
             state.columns.forEach(col => {
-                html += `<div class="header-cell">${col.name}</div>`;
+                html += `<div class="header-cell">
+                <div class="header-content">${col.name}</div>
+            </div>`;
             });
 
             // 2. Data Rows
@@ -498,7 +552,10 @@
                 state.columns.forEach(col => {
                     const role = state.memberships[`${row.id}_${col.id}`] || '';
                     const roleClass = role ? `role-${role.toLowerCase()}` : '';
-                    html += `<div class="cell ${roleClass}">${role}</div>`;
+                    // Use first letter for compact view if needed, or full role
+                    // For rotated headers, cells are usually narrow. 
+                    // Let's keep full role for now but maybe abbreviate if requested later.
+                    html += `<div class="cell ${roleClass}" title="${role}">${role}</div>`;
                 });
             });
 

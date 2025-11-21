@@ -20,3 +20,7 @@ The application has been implemented as a standalone `index.html` file.
 *   **Lazy Loading**: Fetches data only when you expand a group.
 *   **Dynamic Columns**: Adds new members to the table as they are discovered.
 *   **Role Visualization**: Displays roles (Owner, Maintainer, etc.) in the grid.
+*   **Sticky Header**: The header row remains visible while scrolling.
+*   **Rotated Member Names**: Member names in the header are rotated to save horizontal space.
+
+![Application Screenshot](screenshot.png)

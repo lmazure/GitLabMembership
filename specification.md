@@ -43,6 +43,7 @@ The main visualization is a **Matrix Table**.
 
 ### Lazy Loading
 -   **Trigger**: Fetching data happens only when a user expands a group.
+-   **Feedback**: When a group is being expanded and data is fetching, the expand icon (`[+]`) should change to a loading indicator (e.g., a spinner) on that specific row. The global loading state should not block the entire UI if possible, or at least be localized.
 -   **Process**:
     1.  User clicks "Expand" on Group A.
     2.  App checks if children of Group A are already loaded.

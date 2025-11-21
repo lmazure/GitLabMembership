@@ -230,6 +230,28 @@
             color: red;
             margin-top: 10px;
         }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
@@ -261,7 +283,7 @@
         const state = {
             apiKey: '',
             baseUrl: '',
-            rows: [], // { type: 'group'|'project', id, name, full_path, level, expanded, loaded, parentId, hasChildren }
+            rows: [], // { type: 'group'|'project', id, name, full_path, level, expanded, loaded, parentId, hasChildren, isLoading }
             columns: [], // { id, name, username } - Members
             memberships: {}, // Key: rowId_colId, Value: role (string)
             loading: false
@@ -315,7 +337,8 @@
                     expanded: false,
                     loaded: false,
                     parentId: null,
-                    hasChildren: true // Assume root has children initially or we check later
+                    hasChildren: true, // Assume root has children initially or we check later
+                    isLoading: false
                 };
                 state.rows.push(rootRow);
 
@@ -411,24 +434,23 @@
             if (row.expanded) {
                 // Collapse: Hide children
                 row.expanded = false;
-                // We don't remove data, just hide in render? 
-                // Or we can flag children as hidden. 
-                // Simple approach: Render filters visible rows.
-                // But we need to recursively collapse or just hide visual children?
-                // "Collapse" usually just hides immediate children in tree view.
                 renderMatrix();
             } else {
                 // Expand
                 row.expanded = true;
                 if (!row.loaded) {
-                    setLoading(true);
+                    // Row-inline loading
+                    row.isLoading = true;
+                    renderMatrix(); // Update UI to show spinner
+
                     try {
                         await loadChildren(row);
                         row.loaded = true;
                     } catch (e) {
                         showError(e.message);
+                        row.expanded = false; // Revert expansion on error
                     } finally {
-                        setLoading(false);
+                        row.isLoading = false;
                     }
                 }
                 renderMatrix();
@@ -454,7 +476,8 @@
                     expanded: false,
                     loaded: false,
                     parentId: parentRow.id,
-                    hasChildren: true
+                    hasChildren: true,
+                    isLoading: false
                 });
             });
 
@@ -538,9 +561,17 @@
             visibleRows.forEach(row => {
                 // Row Header
                 const indent = row.level * 20;
-                const toggle = row.type === 'group'
-                    ? `<span class="expand-toggle" onclick="toggleGroup(${row.id})">${row.expanded ? '[-]' : '[+]'}</span>`
-                    : `<span class="indent"></span>`; // Spacer for alignment
+
+                let toggle = '';
+                if (row.type === 'group') {
+                    if (row.isLoading) {
+                        toggle = `<span class="loading-spinner"></span>`;
+                    } else {
+                        toggle = `<span class="expand-toggle" onclick="toggleGroup(${row.id})">${row.expanded ? '[-]' : '[+]'}</span>`;
+                    }
+                } else {
+                    toggle = `<span class="indent"></span>`;
+                }
 
                 const icon = row.type === 'group' ? '📂' : '📄';
 

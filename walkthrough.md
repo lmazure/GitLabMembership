@@ -22,5 +22,7 @@ The application has been implemented as a standalone `index.html` file.
 *   **Role Visualization**: Displays roles (Owner, Maintainer, etc.) in the grid.
 *   **Sticky Header**: The header row remains visible while scrolling.
 *   **Rotated Member Names**: Member names in the header are rotated to save horizontal space.
+*   **Row-Inline Loading**: Shows a loading spinner on the specific group row being expanded, keeping the rest of the UI interactive.
 
 ![Application Screenshot](screenshot.png)
+![Loading Spinner](spinner_check.png)

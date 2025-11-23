@@ -1,5 +1,5 @@
 // State
-const state = {
+export const state = {
     apiKey: '',
     baseUrl: '',
     rows: [], // { type: 'group'|'project', id, name, full_path, level, expanded, loaded, parentId, hasChildren, isLoading }
@@ -8,20 +8,30 @@ const state = {
     loading: false
 };
 
-// DOM Elements
-const els = {
-    apiKey: document.getElementById('apiKey'),
-    groupUrl: document.getElementById('groupUrl'),
-    loadBtn: document.getElementById('loadBtn'),
-    errorMsg: document.getElementById('errorMsg'),
-    loading: document.querySelector('.loading'),
-    matrixContainer: document.getElementById('matrixContainer')
-};
+// DOM Elements Getter
+function getEls() {
+    return {
+        apiKey: document.getElementById('apiKey'),
+        groupUrl: document.getElementById('groupUrl'),
+        loadBtn: document.getElementById('loadBtn'),
+        errorMsg: document.getElementById('errorMsg'),
+        loading: document.querySelector('.loading'),
+        matrixContainer: document.getElementById('matrixContainer')
+    };
+}
 
-// Event Listeners
-els.loadBtn.addEventListener('click', initLoad);
+// Initialization
+export function init() {
+    const els = getEls();
+    if (els.loadBtn) {
+        els.loadBtn.addEventListener('click', initLoad);
+    }
+    // Expose to window for onclick in HTML
+    window.toggleGroup = toggleGroup;
+}
 
-async function initLoad() {
+export async function initLoad() {
+    const els = getEls();
     state.apiKey = els.apiKey.value.trim();
     const groupUrlStr = els.groupUrl.value.trim();
 
@@ -74,7 +84,7 @@ async function initLoad() {
     }
 }
 
-function parseGitLabUrl(urlStr) {
+export function parseGitLabUrl(urlStr) {
     try {
         const url = new URL(urlStr);
         // Example: https://gitlab.com/my-org/group
@@ -87,7 +97,7 @@ function parseGitLabUrl(urlStr) {
     }
 }
 
-async function fetchGitLab(endpoint) {
+export async function fetchGitLab(endpoint) {
     const url = `${state.baseUrl}${endpoint}`;
     const response = await fetch(url, {
         headers: {
@@ -104,7 +114,7 @@ async function fetchGitLab(endpoint) {
     return response.json();
 }
 
-async function fetchAndStoreMembers(row) {
+export async function fetchAndStoreMembers(row) {
     const endpoint = row.type === 'group'
         ? `groups/${row.id}/members`
         : `projects/${row.id}/members`;
@@ -135,7 +145,7 @@ async function fetchAndStoreMembers(row) {
     }
 }
 
-function getRoleName(level) {
+export function getRoleName(level) {
     const roles = {
         10: 'Guest',
         20: 'Reporter',
@@ -146,7 +156,7 @@ function getRoleName(level) {
     return roles[level] || level;
 }
 
-async function toggleGroup(rowId) {
+export async function toggleGroup(rowId) {
     const row = state.rows.find(r => r.id === rowId);
     if (!row) return;
 
@@ -176,7 +186,7 @@ async function toggleGroup(rowId) {
     }
 }
 
-async function loadChildren(parentRow) {
+export async function loadChildren(parentRow) {
     // Fetch Subgroups
     const subgroups = await fetchGitLab(`groups/${parentRow.id}/subgroups`);
     // Fetch Projects
@@ -257,6 +267,7 @@ function getVisibleRows() {
 }
 
 function renderMatrix() {
+    const els = getEls();
     const visibleRows = getVisibleRows();
     const totalCols = state.columns.length + 1; // +1 for Row Header
 
@@ -314,14 +325,13 @@ function renderMatrix() {
 }
 
 function setLoading(isLoading) {
+    const els = getEls();
     state.loading = isLoading;
     els.loading.style.display = isLoading ? 'block' : 'none';
     els.loadBtn.disabled = isLoading;
 }
 
 function showError(msg) {
+    const els = getEls();
     els.errorMsg.textContent = msg;
 }
-
-// Expose to window for onclick
-window.toggleGroup = toggleGroup;

@@ -62,9 +62,9 @@ The main visualization is a **Matrix Table**.
     -   Get Members: `/groups/:id/members` and `/projects/:id/members`.
 
 ## Technical Constraints
--   **Single File**: `index.html` containing HTML, CSS, and JS.
--   **No Server**: All logic runs in the browser.
--   **External Libraries**: Minimal. Vanilla JS preferred.
+-   **File Structure**: Modularized into `index.html`, `styles.css`, and `script.js` (ES Module).
+-   **Local Server**: Requires a local HTTP server (e.g., `http-server`) to run due to CORS restrictions with ES Modules.
+-   **External Libraries**: Minimal. Vanilla JS preferred. Testing uses Jest.
 
 ## Validation Steps
 1.  User enters credentials.

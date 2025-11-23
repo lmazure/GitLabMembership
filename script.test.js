@@ -25,6 +25,7 @@ describe('GitLab Membership Viewer', () => {
             expect(getRoleName(40)).toBe('Maintainer');
             expect(getRoleName(30)).toBe('Developer');
             expect(getRoleName(20)).toBe('Reporter');
+            expect(getRoleName(15)).toBe('Planner');
             expect(getRoleName(10)).toBe('Guest');
         });
 

@@ -201,6 +201,11 @@ button:hover {
     background-color: #f9f9f9;
 }
 
+.role-planner {
+    color: #8b7dd8;
+    background-color: #f5f3fc;
+}
+
 /* Add hover effect for rows */
 .matrix-table>div:hover {
     background-color: #f8f9fa;

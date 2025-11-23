@@ -148,6 +148,7 @@ export async function fetchAndStoreMembers(row) {
 export function getRoleName(level) {
     const roles = {
         10: 'Guest',
+        15: 'Planner',
         20: 'Reporter',
         30: 'Developer',
         40: 'Maintainer',

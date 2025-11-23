@@ -32,7 +32,7 @@ The main visualization is a **Matrix Table**.
 
 ### Cells (Roles)
 -   The intersection of a Row (Group/Project) and a Column (Member) displays the **Role** of that member in that specific context.
--   Roles: `Guest`, `Reporter`, `Developer`, `Maintainer`, `Owner`, etc.
+-   Roles: `Guest`, `Planner`, `Reporter`, `Developer`, `Maintainer`, `Owner`, etc.
 -   Empty cell indicates no membership.
 
 ### Header Styling

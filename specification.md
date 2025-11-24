@@ -17,6 +17,9 @@ The main visualization is a **Matrix Table**.
     -   The "Start Group" is the root row.
     -   Sub-groups and Projects are child rows.
 -   **Indentation**: Child items are indented relative to their parents to visually represent depth.
+-   **Member Page Links**: Each row includes a clickable link (👥 icon) that opens the GitLab member management page for that group or project in a new tab.
+    -   Groups link to: `https://gitlab.com/groups/{full_path}/-/group_members`
+    -   Projects link to: `https://gitlab.com/{full_path}/-/project_members`
 -   **Expand/Collapse**:
     -   Groups have an expand/collapse toggle (e.g., `[+]` / `[-]` icon).
     -   **Default State**: The Start Group is initially **collapsed**.

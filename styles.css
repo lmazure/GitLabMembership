@@ -240,6 +240,18 @@ button:hover {
     vertical-align: middle;
 }
 
+.member-link {
+    margin-left: 8px;
+    text-decoration: none;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+    font-size: 0.9em;
+}
+
+.member-link:hover {
+    opacity: 1;
+}
+
 @keyframes spin {
     0% {
         transform: rotate(0deg);

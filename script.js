@@ -217,6 +217,7 @@ export async function loadChildren(parentRow) {
             id: p.id,
             name: p.name,
             full_path: p.full_path,
+            path_with_namespace: p.path_with_namespace,
             level: parentRow.level + 1,
             expanded: false, // Projects don't expand
             loaded: true, // Nothing to load for projects (except members which we do next)
@@ -306,8 +307,17 @@ function renderMatrix() {
 
         const icon = row.type === 'group' ? '📂' : '📄';
 
+        // Build member page URL
+        // Extract origin from baseUrl (e.g., https://gitlab.com from https://gitlab.com/api/v4/)
+        const urlObj = new URL(state.baseUrl);
+        const origin = urlObj.origin; // e.g., https://gitlab.com
+
+        const memberPageUrl = row.type === 'group'
+            ? `${origin}/groups/${row.full_path}/-/group_members`
+            : `${origin}/${row.path_with_namespace || row.full_path}/-/project_members`;
+
         html += `<div class="cell row-header" style="padding-left: ${10 + indent}px">
-        ${toggle} ${icon} ${row.name}
+        ${toggle} ${icon} ${row.name} <a href="${memberPageUrl}" target="_blank" class="member-link" title="Open member page">👥</a>
     </div>`;
 
         // Member Cells

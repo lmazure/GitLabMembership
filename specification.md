@@ -65,9 +65,11 @@ The main visualization is a **Matrix Table**.
     -   Get Members: `/groups/:id/members` and `/projects/:id/members`.
 
 ## Technical Constraints
--   **File Structure**: Modularized into `index.html`, `styles.css`, and `script.js` (ES Module).
+-   **File Structure**: Modularized into `index.html`, `styles.css`, and TypeScript source files (`script.ts`, `script.test.ts`).
+-   **Build Process**: TypeScript source files are compiled to JavaScript in the `dist/` directory using `tsc`.
 -   **Local Server**: Requires a local HTTP server (e.g., `http-server`) to run due to CORS restrictions with ES Modules.
--   **External Libraries**: Minimal. Vanilla JS preferred. Testing uses Jest.
+-   **External Libraries**: Minimal. Vanilla TypeScript preferred. Testing uses Jest with ts-jest.
+-   **Type Safety**: Full TypeScript type definitions for state, API responses, and DOM interactions.
 
 ## Validation Steps
 1.  User enters credentials.

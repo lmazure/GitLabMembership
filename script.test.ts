@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { parseGitLabUrl, getRoleName } from './script.js';
+import { parseGitLabUrl, getRoleName } from './script';
 
 describe('GitLab Membership Viewer', () => {
     describe('parseGitLabUrl', () => {
@@ -30,7 +30,7 @@ describe('GitLab Membership Viewer', () => {
         });
 
         test('returns the level itself if unknown', () => {
-            expect(getRoleName(99)).toBe(99);
+            expect(getRoleName(99)).toBe('99');
         });
     });
 });

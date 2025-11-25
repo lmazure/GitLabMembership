@@ -1,6 +1,6 @@
 # GitLab Membership Viewer
 
-A standalone HTML/JS application to visualize the membership hierarchy of GitLab groups and projects in a matrix view.
+A standalone HTML/TypeScript application to visualize the membership hierarchy of GitLab groups and projects in a matrix view.
 
 ## Purpose
 This tool allows users to explore the hierarchy of a GitLab group (including subgroups and projects) and view the members and their roles at each level. It provides a clear, matrix-style visualization of who has access to what.
@@ -13,17 +13,23 @@ Due to security restrictions with ES Modules (CORS), this application cannot be 
     npm install
     ```
 
-2.  **Start the Application**:
+2.  **Build the Application**:
+    ```bash
+    npm run build
+    ```
+    This compiles the TypeScript source files to JavaScript in the `dist/` directory.
+
+3.  **Start the Application**:
     ```bash
     npm start
     ```
-    This will start a local server (usually at `http://127.0.0.1:8080`).
+    This will build the project and start a local server (usually at `http://127.0.0.1:8080`).
 
-3.  **Open in Browser**:
+4.  **Open in Browser**:
     Click the link provided in the terminal (e.g., `http://127.0.0.1:8080`) to use the application.
 
 ## How to Run Tests
-This project uses **Jest** for automated unit testing.
+This project uses **Jest** with **ts-jest** for automated unit testing.
 
 To run the tests:
 ```bash

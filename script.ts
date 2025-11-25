@@ -1,36 +1,86 @@
+// Interfaces
+interface Row {
+    type: 'group' | 'project';
+    id: number;
+    name: string;
+    full_path: string;
+    path_with_namespace?: string;
+    level: number;
+    expanded: boolean;
+    loaded: boolean;
+    parentId: number | null;
+    hasChildren: boolean;
+    isLoading: boolean;
+}
+
+interface Column {
+    id: number;
+    name: string;
+    username: string;
+}
+
+interface State {
+    apiKey: string;
+    baseUrl: string;
+    rows: Row[];
+    columns: Column[];
+    memberships: Record<string, string>; // Key: rowId_colId, Value: role (string)
+    loading: boolean;
+}
+
+interface GitLabGroup {
+    id: number;
+    name: string;
+    full_path: string;
+}
+
+interface GitLabProject {
+    id: number;
+    name: string;
+    full_path: string;
+    path_with_namespace: string;
+}
+
+interface GitLabMember {
+    id: number;
+    name: string;
+    username: string;
+    access_level: number;
+}
+
 // State
-export const state = {
+export const state: State = {
     apiKey: '',
     baseUrl: '',
-    rows: [], // { type: 'group'|'project', id, name, full_path, level, expanded, loaded, parentId, hasChildren, isLoading }
-    columns: [], // { id, name, username } - Members
-    memberships: {}, // Key: rowId_colId, Value: role (string)
+    rows: [],
+    columns: [],
+    memberships: {},
     loading: false
 };
 
 // DOM Elements Getter
 function getEls() {
     return {
-        apiKey: document.getElementById('apiKey'),
-        groupUrl: document.getElementById('groupUrl'),
-        loadBtn: document.getElementById('loadBtn'),
-        errorMsg: document.getElementById('errorMsg'),
-        loading: document.querySelector('.loading'),
-        matrixContainer: document.getElementById('matrixContainer')
+        apiKey: document.getElementById('apiKey') as HTMLInputElement,
+        groupUrl: document.getElementById('groupUrl') as HTMLInputElement,
+        loadBtn: document.getElementById('loadBtn') as HTMLButtonElement,
+        errorMsg: document.getElementById('errorMsg') as HTMLElement,
+        loading: document.querySelector('.loading') as HTMLElement,
+        matrixContainer: document.getElementById('matrixContainer') as HTMLElement
     };
 }
 
 // Initialization
-export function init() {
+export function init(): void {
     const els = getEls();
     if (els.loadBtn) {
-        els.loadBtn.addEventListener('click', initLoad);
+        els.loadBtn.addEventListener('click', () => initLoad());
     }
     // Expose to window for onclick in HTML
-    window.toggleGroup = toggleGroup;
+    (window as any).toggleGroup = toggleGroup;
 }
 
-export async function initLoad() {
+export async function initLoad(): Promise<void> {
     const els = getEls();
     state.apiKey = els.apiKey.value.trim();
     const groupUrlStr = els.groupUrl.value.trim();
@@ -54,10 +104,10 @@ export async function initLoad() {
         state.baseUrl = baseUrl;
 
         // 2. Fetch Root Group
-        const groupData = await fetchGitLab(`groups/${encodeURIComponent(groupPath)}`);
+        const groupData = await fetchGitLab<GitLabGroup>(`groups/${encodeURIComponent(groupPath)}`);
 
         // 3. Initialize Root Row
-        const rootRow = {
+        const rootRow: Row = {
             type: 'group',
             id: groupData.id,
             name: groupData.name,
@@ -76,7 +126,7 @@ export async function initLoad() {
 
         // 5. Render
         renderMatrix();
-    } catch (err) {
+    } catch (err: any) {
         showError(err.message);
         console.error(err);
     } finally {
@@ -84,7 +134,7 @@ export async function initLoad() {
     }
 }
 
-export function parseGitLabUrl(urlStr) {
+export function parseGitLabUrl(urlStr: string): { baseUrl: string; groupPath: string } {
     try {
         const url = new URL(urlStr);
         // Example: https://gitlab.com/my-org/group
@@ -97,7 +147,7 @@ export function parseGitLabUrl(urlStr) {
     }
 }
 
-export async function fetchGitLab(endpoint) {
+export async function fetchGitLab<T>(endpoint: string): Promise<T> {
     const url = `${state.baseUrl}${endpoint}`;
     const response = await fetch(url, {
         headers: {
@@ -114,12 +164,12 @@ export async function fetchGitLab(endpoint) {
     return response.json();
 }
 
-export async function fetchAndStoreMembers(row) {
+export async function fetchAndStoreMembers(row: Row): Promise<void> {
     const endpoint = row.type === 'group'
         ? `groups/${row.id}/members`
         : `projects/${row.id}/members`;
 
-    const members = await fetchGitLab(endpoint);
+    const members = await fetchGitLab<GitLabMember[]>(endpoint);
 
     let newColumns = false;
     members.forEach(m => {
@@ -145,8 +195,8 @@ export async function fetchAndStoreMembers(row) {
     }
 }
 
-export function getRoleName(level) {
-    const roles = {
+export function getRoleName(level: number): string {
+    const roles: Record<number, string> = {
         10: 'Guest',
         15: 'Planner',
         20: 'Reporter',
@@ -154,10 +204,10 @@ export function getRoleName(level) {
         40: 'Maintainer',
         50: 'Owner'
     };
-    return roles[level] || level;
+    return roles[level] || level.toString();
 }
 
-export async function toggleGroup(rowId) {
+export async function toggleGroup(rowId: number): Promise<void> {
     const row = state.rows.find(r => r.id === rowId);
     if (!row) return;
 
@@ -176,7 +226,7 @@ export async function toggleGroup(rowId) {
             try {
                 await loadChildren(row);
                 row.loaded = true;
-            } catch (e) {
+            } catch (e: any) {
                 showError(e.message);
                 row.expanded = false; // Revert expansion on error
             } finally {
@@ -187,14 +237,14 @@ export async function toggleGroup(rowId) {
     }
 }
 
-export async function loadChildren(parentRow) {
+export async function loadChildren(parentRow: Row): Promise<void> {
     // Fetch Subgroups
-    const subgroups = await fetchGitLab(`groups/${parentRow.id}/subgroups`);
+    const subgroups = await fetchGitLab<GitLabGroup[]>(`groups/${parentRow.id}/subgroups`);
     // Fetch Projects
-    const projects = await fetchGitLab(`groups/${parentRow.id}/projects`);
+    const projects = await fetchGitLab<GitLabProject[]>(`groups/${parentRow.id}/projects`);
 
     // Create new row objects
-    const newRows = [];
+    const newRows: Row[] = [];
 
     subgroups.forEach(g => {
         newRows.push({
@@ -222,7 +272,8 @@ export async function loadChildren(parentRow) {
             expanded: false, // Projects don't expand
             loaded: true, // Nothing to load for projects (except members which we do next)
             parentId: parentRow.id,
-            hasChildren: false
+            hasChildren: false,
+            isLoading: false
         });
     });
 
@@ -236,10 +287,10 @@ export async function loadChildren(parentRow) {
     await Promise.all(promises);
 }
 
-function getVisibleRows() {
+function getVisibleRows(): Row[] {
     // Flatten list is already in order.
     // We just need to skip rows whose parents are collapsed.
-    const visible = [];
+    const visible: Row[] = [];
     // We can track "current visibility scope"
     // But simpler: check if all ancestors are expanded.
     // Optimization: Iterate and maintain a "skip until level X" flag?
@@ -248,7 +299,7 @@ function getVisibleRows() {
     // Since it's a flat list in tree order:
     // If a parent is collapsed, skip all its descendants.
 
-    let skipUntilLevel = null;
+    let skipUntilLevel: number | null = null;
 
     for (const row of state.rows) {
         if (skipUntilLevel !== null) {
@@ -268,10 +319,10 @@ function getVisibleRows() {
     return visible;
 }
 
-function renderMatrix() {
+function renderMatrix(): void {
     const els = getEls();
     const visibleRows = getVisibleRows();
-    const totalCols = state.columns.length + 1; // +1 for Row Header
+    // const totalCols = state.columns.length + 1; // +1 for Row Header
 
     // Update Grid Template
     // First col auto (or fixed width), others auto
@@ -335,14 +386,14 @@ function renderMatrix() {
     els.matrixContainer.innerHTML = html;
 }
 
-function setLoading(isLoading) {
+function setLoading(isLoading: boolean): void {
     const els = getEls();
     state.loading = isLoading;
     els.loading.style.display = isLoading ? 'block' : 'none';
     els.loadBtn.disabled = isLoading;
 }
 
-function showError(msg) {
+function showError(msg: string): void {
     const els = getEls();
     els.errorMsg.textContent = msg;
 }

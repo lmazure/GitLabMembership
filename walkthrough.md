@@ -1,28 +1,37 @@
-# GitLab Membership Viewer Walkthrough
+# Walkthrough - Single File Build System
 
-The application has been implemented as a standalone `index.html` file.
+I have successfully removed the dependency on a local HTTP server and implemented a build system that generates a single, standalone HTML file.
 
-## How to Use
+## Changes
 
-1.  **Open the File**: Double-click `index.html` in your file explorer to open it in your web browser.
-2.  **Enter Credentials**:
-    *   **GitLab API Key**: Enter your Personal Access Token (PAT). Ensure it has `read_api` scope.
-    *   **Start Group URL**: Enter the full URL of the GitLab group you want to visualize (e.g., `https://gitlab.com/my-org/my-group`).
-3.  **Load**: Click the "Load Hierarchy" button.
-4.  **Interact**:
-    *   The table will show the root group initially.
-    *   Click the `[+]` icon next to a group name to expand it. This will fetch sub-groups, projects, and members dynamically.
-    *   Members are listed in columns.
-    *   Cells show the role of each member in the corresponding group/project.
+### Build System
+- **Created `bundle.js`**: A custom Node.js script that inlines `styles.css` and the compiled `script.js` into `index.html`.
+- **Updated `package.json`**:
+    - Removed `http-server` dependency.
+    - Updated `build` script to run `tsc` followed by `node bundle.js`.
+    - Removed `start` script as it's no longer needed.
 
-## Features Implemented
-*   **Standalone**: No server required.
-*   **Lazy Loading**: Fetches data only when you expand a group.
-*   **Dynamic Columns**: Adds new members to the table as they are discovered.
-*   **Role Visualization**: Displays roles (Owner, Maintainer, etc.) in the grid.
-*   **Sticky Header**: The header row remains visible while scrolling.
-*   **Rotated Member Names**: Member names in the header are rotated to save horizontal space.
-*   **Row-Inline Loading**: Shows a loading spinner on the specific group row being expanded, keeping the rest of the UI interactive.
+### Documentation
+- **Updated `README.md`**: Removed instructions for `npm start` and added instructions for `npm run build` and opening the generated file.
+- **Updated `specification.md`**: Reflected the new build process and removal of the local server requirement.
 
-![Application Screenshot](screenshot.png)
-![Loading Spinner](spinner_check.png)
+## Verification Results
+
+### Automated Build
+Ran `wsl npm run build` successfully.
+```text
+> gitlabmembership@1.0.0 build
+> node node_modules/typescript/bin/tsc && node bundle.js
+
+Bundling...
+Bundled to /mnt/g/Documents/repos/GitLabMembership/dist/index.html
+```
+
+### File Verification
+Verified the output file `dist/index.html` exists and has the expected size (~16KB), confirming that content was inlined.
+```text
+-rwxrwxrwx 1 laurent laurent 16694 Nov 26 07:36 dist/index.html
+```
+
+## Next Steps
+You can now simply run `npm run build` (or `wsl npm run build` if using WSL) and open `dist/index.html` in any browser to use the application.

@@ -66,8 +66,8 @@ The main visualization is a **Matrix Table**.
 
 ## Technical Constraints
 -   **File Structure**: Modularized into `index.html`, `styles.css`, and TypeScript source files (`script.ts`, `script.test.ts`).
--   **Build Process**: TypeScript source files are compiled to JavaScript in the `dist/` directory using `tsc`.
--   **Local Server**: Requires a local HTTP server (e.g., `http-server`) to run due to CORS restrictions with ES Modules.
+-   **Build Process**: TypeScript source files are compiled to JavaScript, then bundled with HTML and CSS into a single `dist/index.html` file using a custom Node.js script.
+-   **Local Server**: No longer required. The output `dist/index.html` can be opened directly in a browser.
 -   **External Libraries**: Minimal. Vanilla TypeScript preferred. Testing uses Jest with ts-jest.
 -   **Type Safety**: Full TypeScript type definitions for state, API responses, and DOM interactions.
 
